@@ -1,13 +1,12 @@
 import re
 
-
 class ExtratorURL:
     def __init__(self: object, url: str) -> None:
         self.url = self.sanitiza_url(url)
         self.valida_url()
 
     def sanitiza_url(self: object, url: str) -> str:
-        if type(url) == str:
+        if isinstance(url, str):
             return url.strip()
         else:
             return ''
@@ -16,12 +15,10 @@ class ExtratorURL:
         if not self.url:
             raise ValueError('A URL está vazia')
 
-        url = 'https://www.bytebank.com.br/cambio'
         padrao_url = re.compile(
             '(http(s)?://)?(www.)?bytebank.com(.br)?/cambio'
         )
         match = padrao_url.match(url)
-
         if not match:
             raise ValueError('A URL não é válida')
 
@@ -32,8 +29,10 @@ class ExtratorURL:
 
     def get_url_parametro(self: object) -> str:
         indice_interrogacao = self.url.find('?')
-        url_parametro = self.url[indice_interrogacao + 1 :]
-        return url_parametro
+
+        if indice_interrogacao:
+            url_parametro = self.url[indice_interrogacao + 1 :]
+            return url_parametro
 
     def get_valor_parametro(self: object, parametro_busca) -> int:
         indice_parametro = self.get_url_parametro().find(parametro_busca)
@@ -55,26 +54,28 @@ class ExtratorURL:
     def __eq__(self: object, other: str) -> bool:
         return self.url == other.url
 
-    def consersao_moeda(self: object) -> None:
-        valor_dolar = 5.50
-        moeda_origem = extrator_url.get_valor_parametro('moedaOrigem')
-        moeda_destino = extrator_url.get_valor_parametro('moedaDestino')
-        quantidade = extrator_url.get_valor_parametro('quantidade')
-
-        if moeda_origem == 'dolar' and moeda_destino == 'real':
-            conversao = int(quantidade) * valor_dolar
-            print(
-                f'{quantidade} dolares convertidos para real dá {conversao} reais'
-            )
-        elif moeda_origem == 'real' and moeda_destino == 'dolar':
-            conversao = int(quantidade) // valor_dolar
-            print(
-                f'{quantidade} reais convertidos para dolar dá {conversao} dolares'
-            )
-
-
-url = 'bytebank.com/cambio?quantidade=100&moedaOrigem=real&moedaDestino=dolar'
+url = "bytebank.com/cambio?quantidade=100&moedaOrigem=dolar&moedaDestino=real"
 extrator_url = ExtratorURL(url)
-extrator_url.consersao_moeda()
+
 print(f'O tamanho da URL é de {len(extrator_url)} caracteres')
 print(extrator_url)
+
+moeda_origem = extrator_url.get_valor_parametro('moedaOrigem')
+moeda_destino = extrator_url.get_valor_parametro('moedaDestino')
+quantidade = extrator_url.get_valor_parametro('quantidade')
+
+valor_dolar = 5.50
+
+def consersao_moeda() -> None:
+    if moeda_origem == 'dolar' and moeda_destino == 'real':
+        conversao = int(quantidade) * valor_dolar
+        print(
+            f'{quantidade} dolares convertidos para real dá {conversao} reais'
+        )
+    elif moeda_origem == 'real' and moeda_destino == 'dolar':
+        conversao = int(quantidade) // valor_dolar
+        print(
+            f'{quantidade} reais convertidos para dolar dá {conversao} dolares'
+        )
+
+consersao_moeda()
